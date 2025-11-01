@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autonomes Deployment System - Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+
+        .capabilities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: slideUp 0.6s ease-out backwards;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+        .card:nth-child(5) { animation-delay: 0.5s; }
+        .card:nth-child(6) { animation-delay: 0.6s; }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .card-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .card p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .card ul {
+            list-style: none;
+            color: #666;
+        }
+
+        .card ul li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .card ul li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .demo-section h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+            font-size: 2em;
+        }
+
+        .interactive-demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .demo-input {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .demo-output {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        textarea, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            margin-top: 10px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .example-code {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .interactive-demo {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Autonomes Deployment System</h1>
+            <p>Eine intelligente Plattform zur sofortigen Erstellung und Bereitstellung von Web-Anwendungen</p>
+        </div>
+
+        <div class="capabilities">
+            <div class="card">
+                <div class="card-icon">🎨</div>
+                <h2>Web-Anwendungen</h2>
+                <p>Erstelle vollständige Webanwendungen:</p>
+                <ul>
+                    <li>Interaktive Dashboards</li>
+                    <li>Portfolio-Websites</li>
+                    <li>Landing Pages</li>
+                    <li>Datenvisualisierungen</li>
+                    <li>Formular-Apps</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🎮</div>
+                <h2>Spiele & Tools</h2>
+                <p>Entwickle spielerische Anwendungen:</p>
+                <ul>
+                    <li>Browser-Spiele</li>
+                    <li>Puzzle & Rätsel</li>
+                    <li>Rechner & Konverter</li>
+                    <li>Produktivitäts-Tools</li>
+                    <li>Lern-Apps</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <h2>Daten & Analytics</h2>
+                <p>Visualisiere und analysiere Daten:</p>
+                <ul>
+                    <li>Chart-Bibliotheken</li>
+                    <li>Echtzeit-Monitoring</li>
+                    <li>Statistik-Dashboards</li>
+                    <li>API-Integrationen</li>
+                    <li>Datenexplorer</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🛠️</div>
+                <h2>Developer Tools</h2>
+                <p>Nützliche Entwickler-Werkzeuge:</p>
+                <ul>
+                    <li>Code-Generatoren</li>
+                    <li>JSON-Formatter</li>
+                    <li>RegEx-Tester</li>
+                    <li>Color-Picker</li>
+                    <li>Markdown-Editoren</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">💼</div>
+                <h2>Business Apps</h2>
+                <p>Professionelle Geschäftsanwendungen:</p>
+                <ul>
+                    <li>CRM-Systeme</li>
+                    <li>Projekt-Management</li>
+                    <li>Invoice-Generator</li>
+                    <li>Zeiterfassung</li>
+                    <li>Dokumentenmanagement</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🎯</div>
+                <h2>Kreative Projekte</h2>
+                <p>Innovative und kreative Lösungen:</p>
+                <ul>
+                    <li>Animations-Demos</li>
+                    <li>Interaktive Kunst</li>
+                    <li>Audio-Visualizer</li>
+                    <li>Galerie-Systeme</li>
+                    <li>Experimentelle UIs</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📝 Beispiel-Anfragen</h2>
+            <p style="color: #666; margin-bottom: 20px;">Probiere eine dieser Anfragen aus, um zu sehen, was möglich ist:</p>
+
+            <div class="example-code">
+                <code>Erstelle ein interaktives To-Do-Listen-Tool mit Prioritäten</code>
+            </div>
+            <div class="example-code">
+                <code>Baue einen BMI-Rechner mit Visualisierung</code>
+            </div>
+            <div class="example-code">
+                <code>Entwickle ein Memory-Spiel mit verschiedenen Schwierigkeitsgraden</code>
+            </div>
+            <div class="example-code">
+                <code>Erstelle einen Countdown-Timer mit mehreren Timern</code>
+            </div>
+            <div class="example-code">
+                <code>Baue einen Markdown-Editor mit Live-Preview</code>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>⚡ Live-Demo: Text-Analyzer</h2>
+
+            <div class="interactive-demo">
+                <div class="demo-input">
+                    <label><strong>Gib einen Text ein:</strong></label>
+                    <textarea id="inputText" placeholder="Schreibe oder füge hier deinen Text ein...">Das autonome Deployment-System kann in Sekunden vollständige Web-Anwendungen erstellen und bereitstellen!</textarea>
+                    <button onclick="analyzeText()">Text analysieren</button>
+                </div>
+
+                <div class="demo-output" id="output">
+                    <div id="outputContent">
+                        Ergebnisse erscheinen hier...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🌟 Technologie-Stack</h2>
+            <p style="color: #666; margin-bottom: 20px;">Das System unterstützt moderne Web-Technologien:</p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; text-align: center;">
+                    <strong>HTML5 / CSS3</strong>
+                    <p style="font-size: 0.9em; color: #666; margin-top: 5px;">Moderne Web-Standards</p>
+                </div>
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; text-align: center;">
+                    <strong>JavaScript / ES6+</strong>
+                    <p style="font-size: 0.9em; color: #666; margin-top: 5px;">Moderne Sprach-Features</p>
+                </div>
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; text-align: center;">
+                    <strong>React / Next.js</strong>
+                    <p style="font-size: 0.9em; color: #666; margin-top: 5px;">Frontend-Frameworks</p>
+                </div>
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; text-align: center;">
+                    <strong>Vercel Deployment</strong>
+                    <p style="font-size: 0.9em; color: #666; margin-top: 5px;">Automatische Bereitstellung</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>✨ Bereit, deine eigene Anwendung zu erstellen? Beschreibe einfach, was du bauen möchtest! ✨</p>
+        </div>
+    </div>
+
+    <script>
+        function analyzeText() {
+            const text = document.getElementById('inputText').value;
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+            const chars = text.length;
+            const charsNoSpaces = text.replace(/\s/g, '').length;
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+            const paragraphs = text.split(/\n\n+/).filter(p => p.trim().length > 0).length;
+
+            // Durchschnittliche Wortlänge
+            const avgWordLength = words.length > 0
+                ? (charsNoSpaces / words.length).toFixed(2)
+                : 0;
+
+            // Längste Wörter finden
+            const sortedWords = [...words].sort((a, b) => b.length - a.length);
+            const longestWords = sortedWords.slice(0, 3);
+
+            // Lesezeit (durchschnittlich 200 Wörter pro Minute)
+            const readingTime = Math.ceil(words.length / 200);
+
+            const output = `
+> Text-Analyse Ergebnis
+==========================================
+
+📊 Statistiken:
+  ├─ Wörter: ${words.length}
+  ├─ Zeichen: ${chars}
+  ├─ Zeichen (ohne Leerzeichen): ${charsNoSpaces}
+  ├─ Sätze: ${sentences}
+  ├─ Absätze: ${paragraphs}
+  └─ Durchschnittliche Wortlänge: ${avgWordLength}
+
+📖 Lesbarkeit:
+  └─ Geschätzte Lesezeit: ${readingTime} Min.
+
+🏆 Längste Wörter:
+  ${longestWords.map((word, i) => `${i + 1}. ${word} (${word.length} Zeichen)`).join('\n  ')}
+
+✓ Analyse abgeschlossen
+            `;
+
+            document.getElementById('outputContent').textContent = output;
+        }
+
+        // Initiale Analyse durchführen
+        window.addEventListener('load', () => {
+            analyzeText();
+        });
+    </script>
+</body>
+</html>
